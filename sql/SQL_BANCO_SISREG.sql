@@ -2,25 +2,25 @@
 SELECT
 
 RIGHT(REVERSE(
-	REPLACE(SOL.nu_cns_paciente,'0','X')),11) 	AS "CNS_USUARIO",		-- CNS ANONIMIZADO
---SOL.nu_cns_paciente 							AS "CNS_USUARIO",   	-- CNS USUARIO
---USU.no_usuario								AS "NOME_USUARIO",		-- NOME USUARIO
-((SOL.dt_solicitacao - USU.dt_nascimento)/365)	AS "IDADE_USUARIO",   	-- IDADE DO PACIENTE NO ATO DA SOLICITAÇÃO 
+	REPLACE(SOL.nu_cns_paciente,'0','X')),11) 	AS "CNS_USUARIO",	-- CNS ANONIMIZADO
+--SOL.nu_cns_paciente 							AS "CNS_USUARIO",   -- CNS USUARIO
+--USU.no_usuario								AS "NOME_USUARIO",	-- NOME USUARIO
+((SOL.dt_solicitacao - USU.dt_nascimento)/365)	AS "IDADE_USUARIO",   -- IDADE DO PACIENTE NO ATO DA SOLICITAÇÃO 
 PDR.no_municipio 								AS "MUNICIPIO_USUARIO", -- CONFORME CADWEB
-USU.co_municipio_ibge							AS "IBGE_USUARIO",		-- CONFORME CADWEB
+USU.co_municipio_ibge							AS "IBGE_USUARIO",	-- CONFORME CADWEB
 
 (CASE
 	WHEN USU.co_sexo = 'F' THEN 'FEMININO' 
 	WHEN USU.co_sexo = 'M' THEN 'MASCULINO'
-	ELSE 'INDEFINIDO/NÃO INFORMADO' END)		AS "SEXO_USUARIO",		-- CONFORME CADWEB 
+	ELSE 'INDEFINIDO/NÃO INFORMADO' END)		AS "SEXO_USUARIO",	-- CONFORME CADWEB 
 	
 (CASE 
-	WHEN USU.tp_raca = '01' THEN 'Branca'
-	WHEN USU.tp_raca = '02' THEN 'Negra'
-	WHEN USU.tp_raca = '03' THEN 'Amarela'	
-	WHEN USU.tp_raca = '04' THEN 'Parda'
-	WHEN USU.tp_raca = '05' THEN 'Indigena'
-	ELSE 'Indefinida' END) 						AS "RACA_COR_USUARIO", 	-- CONFORME IBGE 
+	WHEN USU.tp_raca = '01' THEN 'BRANCA'
+	WHEN USU.tp_raca = '02' THEN 'PRETA'
+	WHEN USU.tp_raca = '03' THEN 'AMARELA'
+	WHEN USU.tp_raca = '04' THEN 'PARDA'
+	WHEN USU.tp_raca = '05' THEN 'INDIGENA'
+	ELSE 'INDEFENIDA' END) 						AS "RACA_COR_USUARIO", 	-- CONFORME IBGE 
 					
 USU.nu_cep										AS "CEP_USUARIO",		-- CONFORME CADWEB 
 
@@ -32,23 +32,23 @@ USU.nu_cep										AS "CEP_USUARIO",		-- CONFORME CADWEB
  	ELSE 'ATENDIDO FORA DO ESTADO DO USUARIO' END) AS "DESLOCAMENTO",	-- RELAÇÃO ESTUDO ANTERIOR
 MAR.co_cnes_ups									AS "CNES_EXECUTANTE",	-- CONFORME SISREG
 UPS.nu_cep										AS "CEP_UNID_EXECUTANTE",
-ESP.ds_cbo_ocupacao								AS "ESPECIALIDADE",		-- CONFORME SISREG
+UPPER(ESP.ds_cbo_ocupacao)						AS "ESPECIALIDADE",		-- CONFORME SISREG
 
 (CASE 
  	WHEN SOL.nu_carater = '0' 
- 		THEN 'Prioridade Zero - Emergência, necessidade de atendimento imediato'
+ 		THEN 'PRIORIDADE ZERO - EMERGÊNCIA, NECESSIDADE DE ATENDIMENTO IMEDIATO'
  	WHEN SOL.nu_carater = '1' 
- 		THEN 'Prioridade 1 - Urgência, atendimento o mais rápido possível' 
+ 		THEN 'PRIORIDADE 1 - URGÊNCIA, ATENDIMENTO O MAIS RÁPIDO POSSÍVEL' 
 	WHEN SOL.nu_carater = '2' 
-  		THEN 'Prioridade 2 - Prioridade não urgente'
-	ELSE 'Prioridade 3 - atendimento eletivo ' END) AS "GRAVIDADE",		-- CONFORME SISREG
+  		THEN 'PRIORIDADE 2 - PRIORIDADE NÃO URGENTE'
+	ELSE 'PRIORIDADE 3 - ATENDIMENTO ELETIVO' END) AS "GRAVIDADE",	-- CONFORME SISREG
  									
-MAR.dt_marcacao 								AS "DATA_ATEND",
-(mar.dt_marcacao - SOL.dt_solicitacao) 			AS "TEMPO_ESPERA",		-- TEMPO EM DIAS
+DATE(MAR.dt_marcacao) 							AS "DATA_ATEND",
+(mar.dt_marcacao - SOL.dt_solicitacao) 			AS "TEMPO_ESPERA",	-- TEMPO EM DIAS
 (CASE
-	WHEN MAR.st_falta = '0' THEN 'CONF'
+	WHEN MAR.st_falta = '0' THEN 'CONFIRMADO'
 	WHEN MAR.st_falta = '1' THEN 'FALTA'
-	ELSE 'PEND' END)							AS "CONF_ATEND",
+	ELSE 'PENDENTE' END)						AS "CONF_ATEND",
 COUNT(1) AS QUANT
 
 FROM	dbregulacao.tb_solicitacao 		AS SOL
